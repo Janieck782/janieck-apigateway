@@ -30,25 +30,36 @@ def hello():
         return redirect(url_for('index'))
 
 
+# Configura la URL de la API de Buda
+BUDA_API_URL = "https://www.buda.com/api/v2/markets/BTC-CLP/trades"
+
+
 @app.route('/api', methods=['GET'])
 def proxy():
     date = request.args.get('date')
+
     try:
         date_in_milliseconds = int(date) * 1000
     except ValueError:
         return jsonify({"error": "Invalid date format"}), 400
 
-    url = f"https://www.buda.com/api/v2/markets/BTC-CLP/trades?timestamp={date_in_milliseconds}&limit=1"
-    response = requests.get(url)
+    # Construye la URL de la API de Buda con el timestamp
+    params = {
+        "timestamp": date_in_milliseconds*1000,
+        "limit": 1
+    }
 
-    if response.status_code == 200:
-        try:
-            json_data = response.json()
-            return jsonify(json_data)
-        except ValueError:
-            return jsonify({"error": "Invalid JSON response from the API"}), 500
-    else:
-        return jsonify({"error": f"API returned a non-successful status code: {response.status_code}"}), 500
+    try:
+        # Realiza una solicitud a la API de Buda usando requests
+        response = requests.get(BUDA_API_URL, params=params)
+
+        if response.status_code == 200:
+            # Si la solicitud fue exitosa, devuelve la respuesta
+            return jsonify(response.json())
+        else:
+            return jsonify({"error": f"API returned a non-successful status code: {response.status_code}"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 if __name__ == '__main__':
