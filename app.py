@@ -1,9 +1,10 @@
 import os
 import requests
-from flask import (Flask, redirect, render_template, request,
-                   send_from_directory, url_for, jsonify)
+from flask import Flask, redirect, render_template, request, send_from_directory, url_for, jsonify
+from flask_cors import CORS  # Importa la extensión Flask-CORS
 
 app = Flask(__name__)
+CORS(app)  # Habilita CORS para todas las rutas de la aplicación
 
 
 @app.route('/')
@@ -14,8 +15,7 @@ def index():
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_from_directory(os.path.join(app.root_path, 'static'),
-                               'favicon.ico', mimetype='image/vnd.microsoft.icon')
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 
 @app.route('/hello', methods=['POST'])
